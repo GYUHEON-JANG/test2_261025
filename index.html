@@ -1,0 +1,648 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Claude 연결 그림책</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: 그림책처럼 한 장씩 넘기는 세로 흐름. 앱마다 색 띠, 단계마다 그림 카드 + 설명 */
+:root{
+  --paper:#FFFDF6; --ink:#24324A; --soft:#5B6A84; --line:#E4DCC8;
+  --card:#FFFFFF; --sun:#FFC83D; --claude:#D97757;
+  --suno:#8B5CF6; --higgs:#0EA5A4; --unity:#3B4A63; --jev:#E2558B; --aside:#2F7DE1;
+  --tint:#FFF3D6; --code:#1F2937; --codefg:#F8FAFC; --warn:#FFE7E7; --warnfg:#9B1C1C; --ok:#E3F7EC; --okfg:#166534;
+  --f-display:"Jua","Gowun Dodum",system-ui,sans-serif;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#171B26; --ink:#F1EEE6; --soft:#A9B3C6; --line:#323A4D; --card:#212736;
+  --tint:#2A2A22; --code:#0B0F17; --codefg:#E8EDF5; --warn:#3A1F24; --warnfg:#FFB4B4; --ok:#173126; --okfg:#9BE3B5;
+  --unity:#8EA0BF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#171B26; --ink:#F1EEE6; --soft:#A9B3C6; --line:#323A4D; --card:#212736;
+  --tint:#2A2A22; --code:#0B0F17; --codefg:#E8EDF5; --warn:#3A1F24; --warnfg:#FFB4B4; --ok:#173126; --okfg:#9BE3B5;
+  --unity:#8EA0BF; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:18px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:900px;margin:0 auto;padding-block:32px 80px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;line-height:1.25;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,7vw,56px)}
+h2{font-size:clamp(28px,5vw,38px)}
+h3{font-size:24px}
+p{margin:0}
+.lead{font-size:20px;color:var(--soft);max-width:60ch}
+svg text{font-family:var(--f-display)}
+
+/* hero */
+.hero{display:grid;gap:20px}
+.hero svg{width:100%;height:auto;max-width:100%}
+
+/* nav chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:2px solid currentColor;
+  font-family:var(--f-display);font-size:19px;text-decoration:none;background:var(--card)}
+.chip:focus-visible,.copy:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.stars{letter-spacing:2px;color:var(--sun)}
+
+/* sections */
+section{display:flex;flex-direction:column;gap:22px;scroll-margin-top:16px}
+.band{border-radius:22px;padding:22px;color:#fff;display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between}
+.band h2{color:#fff}
+.band p{color:#ffffffde;font-size:17px}
+.band .meta{display:flex;flex-direction:column;gap:4px;min-width:0}
+.badge{background:#ffffff2e;border-radius:999px;padding:6px 14px;font-family:var(--f-display);font-size:17px;white-space:nowrap}
+
+.steps{display:flex;flex-direction:column;gap:18px;counter-reset:s}
+.step{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px;align-items:center;
+  background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px}
+.step .pic svg{width:100%;height:auto;display:block}
+.step .txt{display:flex;flex-direction:column;gap:8px;min-width:0}
+.num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;
+  font-family:var(--f-display);font-size:22px;color:#fff;flex:none}
+.step-head{display:flex;align-items:center;gap:12px}
+@media (max-width:640px){.step{grid-template-columns:minmax(0,1fr)}.step .pic{max-width:320px}}
+
+/* code */
+.code{position:relative;background:var(--code);color:var(--codefg);border-radius:14px;padding:14px 16px;padding-right:76px;
+  font-family:var(--f-mono);font-size:14px;line-height:1.6;overflow-x:auto;white-space:pre;margin:0}
+.copy{position:absolute;top:8px;right:8px;font-family:var(--f-display);font-size:15px;border:0;border-radius:8px;
+  padding:6px 10px;background:var(--sun);color:#24324A;cursor:pointer}
+kbd,.k{font-family:var(--f-display);background:var(--tint);border:1.5px solid var(--line);border-radius:8px;padding:1px 8px;white-space:nowrap}
+
+.note{border-radius:16px;padding:14px 18px;font-size:17px;display:flex;flex-direction:column;gap:4px}
+.note b{font-family:var(--f-display);font-weight:400;font-size:19px}
+.note.warn{background:var(--warn);color:var(--warnfg)}
+.note.ok{background:var(--ok);color:var(--okfg)}
+.note.tip{background:var(--tint);color:var(--ink)}
+
+/* what is mcp */
+.explain{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.explain figure{margin:0;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.explain svg{width:100%;height:auto}
+figcaption{font-size:17px}
+
+.prep{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.prep div{background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.prep b{font-family:var(--f-display);font-weight:400;font-size:20px}
+.prep span{font-size:16px;color:var(--soft)}
+
+footer{font-size:15px;color:var(--soft);display:flex;flex-direction:column;gap:6px}
+footer a{color:inherit}
+a{color:var(--claude)}
+@media (prefers-reduced-motion:no-preference){.wiggle{animation:w 2.4s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes w{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}}
+</style>
+
+<div class="wrap">
+
+<!-- ========== HERO ========== -->
+<header class="hero">
+  <svg viewBox="0 0 800 370" role="img" aria-label="가운데 Claude 로봇에 Suno, Higgsfield, Unity, Jev, Aside 다섯 개의 플러그가 꽂혀 있는 그림">
+    <!-- cables -->
+    <g fill="none" stroke-width="8" stroke-linecap="round">
+      <path d="M400 200 V300" stroke="var(--aside)"/>
+      <path d="M400 150 C300 150 260 60 150 60" stroke="var(--suno)"/>
+      <path d="M400 150 C300 150 260 240 150 240" stroke="var(--higgs)"/>
+      <path d="M400 150 C500 150 540 60 650 60" stroke="var(--unity)"/>
+      <path d="M400 150 C500 150 540 240 650 240" stroke="var(--jev)"/>
+    </g>
+    <!-- apps -->
+    <g>
+      <rect x="40" y="28" width="150" height="64" rx="18" fill="var(--suno)"/><text x="115" y="70" text-anchor="middle" font-size="26" fill="#fff">Suno</text>
+      <rect x="20" y="208" width="190" height="64" rx="18" fill="var(--higgs)"/><text x="115" y="250" text-anchor="middle" font-size="24" fill="#fff">Higgsfield</text>
+      <rect x="610" y="28" width="150" height="64" rx="18" fill="var(--unity)"/><text x="685" y="70" text-anchor="middle" font-size="26" fill="#fff">Unity</text>
+      <rect x="610" y="208" width="150" height="64" rx="18" fill="var(--jev)"/><text x="685" y="250" text-anchor="middle" font-size="26" fill="#fff">Jev</text>
+      <rect x="325" y="296" width="150" height="64" rx="18" fill="var(--aside)"/><text x="400" y="338" text-anchor="middle" font-size="26" fill="#fff">Aside</text>
+    </g>
+    <!-- claude robot -->
+    <g class="wiggle">
+      <rect x="330" y="80" width="140" height="130" rx="34" fill="var(--claude)"/>
+      <circle cx="372" cy="135" r="12" fill="#fff"/><circle cx="428" cy="135" r="12" fill="#fff"/>
+      <circle cx="374" cy="137" r="5" fill="#24324A"/><circle cx="430" cy="137" r="5" fill="#24324A"/>
+      <path d="M380 170 Q400 186 420 170" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <line x1="400" y1="80" x2="400" y2="56" stroke="var(--claude)" stroke-width="6"/><circle cx="400" cy="50" r="9" fill="var(--sun)"/>
+      <rect x="355" y="220" width="90" height="30" rx="10" fill="var(--paper)"/>
+      <text x="400" y="244" text-anchor="middle" font-size="24" fill="var(--ink)">Claude</text>
+    </g>
+  </svg>
+  <h1>Claude에게 새 친구 5명 소개하기</h1>
+  <p class="lead">Claude는 혼자서는 노래를 만들거나 게임을 고칠 수 없어요. 하지만 <b>MCP</b>라는 플러그를 꽂아 주면 Suno, Higgsfield, Unity, Jev, Aside와 이야기할 수 있게 돼요. 그림을 보면서 한 단계씩 따라 해 봐요.</p>
+  <nav class="chips" aria-label="바로가기">
+    <a class="chip" href="#higgsfield" style="color:var(--higgs)">Higgsfield <span class="stars">★</span></a>
+    <a class="chip" href="#unity" style="color:var(--unity)">Unity <span class="stars">★★</span></a>
+    <a class="chip" href="#aside" style="color:var(--aside)">Aside <span class="stars">★★</span></a>
+    <a class="chip" href="#suno" style="color:var(--suno)">Suno <span class="stars">★★★</span></a>
+    <a class="chip" href="#jev" style="color:var(--jev)">Jev <span class="stars">★★★</span></a>
+  </nav>
+  <p style="font-size:16px;color:var(--soft)">별이 적을수록 쉬워요. 처음이라면 Higgsfield부터 해 보세요.</p>
+</header>
+
+<!-- ========== MCP 란? ========== -->
+<section id="what">
+  <h2>MCP가 뭐예요?</h2>
+  <div class="explain">
+    <figure>
+      <svg viewBox="0 0 260 150" role="img" aria-label="플러그가 콘센트에 꽂히는 그림">
+        <rect x="150" y="30" width="90" height="90" rx="18" fill="var(--tint)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="178" y="58" width="8" height="22" rx="3" fill="var(--ink)"/><rect x="204" y="58" width="8" height="22" rx="3" fill="var(--ink)"/>
+        <rect x="40" y="48" width="70" height="54" rx="14" fill="var(--claude)"/>
+        <rect x="110" y="58" width="30" height="8" rx="3" fill="var(--soft)"/><rect x="110" y="84" width="30" height="8" rx="3" fill="var(--soft)"/>
+        <path d="M40 75 L8 75" stroke="var(--claude)" stroke-width="8" stroke-linecap="round"/>
+        <text x="75" y="83" text-anchor="middle" font-size="18" fill="#fff">MCP</text>
+      </svg>
+      <figcaption><b>플러그예요.</b> 전기 플러그를 꽂으면 TV가 켜지듯, MCP를 꽂으면 Claude가 다른 앱을 쓸 수 있어요.</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 260 150" role="img" aria-label="Claude가 말풍선으로 부탁하고 앱이 결과를 돌려주는 그림">
+        <rect x="14" y="50" width="70" height="70" rx="20" fill="var(--claude)"/>
+        <circle cx="38" cy="80" r="6" fill="#fff"/><circle cx="60" cy="80" r="6" fill="#fff"/>
+        <rect x="176" y="50" width="70" height="70" rx="20" fill="var(--suno)"/>
+        <path d="M200 98 v-28 l22 -6 v28" stroke="#fff" stroke-width="5" fill="none"/><circle cx="196" cy="98" r="6" fill="#fff"/><circle cx="218" cy="92" r="6" fill="#fff"/>
+        <path d="M92 70 H168" stroke="var(--ink)" stroke-width="4" marker-end="url(#ar)"/>
+        <path d="M168 104 H92" stroke="var(--ink)" stroke-width="4" marker-end="url(#ar)"/>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--ink)"/></marker></defs>
+        <text x="130" y="58" text-anchor="middle" font-size="15" fill="var(--ink)">"노래 만들어줘"</text>
+        <text x="130" y="128" text-anchor="middle" font-size="15" fill="var(--ink)">"다 만들었어!"</text>
+      </svg>
+      <figcaption><b>심부름 통로예요.</b> 내가 Claude에게 말하면, Claude가 MCP 통로로 앱에 부탁하고 결과를 받아 와요.</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 260 150" role="img" aria-label="두 가지 연결 방법: 주소 붙여넣기와 설정 파일 쓰기">
+        <rect x="14" y="24" width="108" height="100" rx="14" fill="var(--card)" stroke="var(--higgs)" stroke-width="3"/>
+        <rect x="26" y="56" width="84" height="22" rx="6" fill="var(--tint)"/>
+        <text x="68" y="72" text-anchor="middle" font-size="12" fill="var(--ink)">https://...</text>
+        <text x="68" y="104" text-anchor="middle" font-size="15" fill="var(--higgs)">주소 붙이기</text>
+        <rect x="138" y="24" width="108" height="100" rx="14" fill="var(--card)" stroke="var(--suno)" stroke-width="3"/>
+        <text x="192" y="64" text-anchor="middle" font-size="22" fill="var(--suno)">{ }</text>
+        <text x="192" y="104" text-anchor="middle" font-size="15" fill="var(--suno)">설정 파일 쓰기</text>
+      </svg>
+      <figcaption><b>꽂는 방법은 두 가지.</b> 주소만 붙이면 되는 쉬운 방법과, 설정 파일에 적어 주는 조금 어려운 방법이 있어요.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== 준비물 ========== -->
+<section id="prep">
+  <h2>시작하기 전 준비물</h2>
+  <div class="prep">
+    <div><b>Claude 데스크톱 앱</b><span>claude.ai/download 에서 받아요. 웹사이트보다 앱이 연결하기 쉬워요.</span></div>
+    <div><b>각 앱의 계정</b><span>Suno, Higgsfield, Unity 계정. 크레딧(이용권)이 있어야 만들 수 있어요.</span></div>
+    <div><b>어른 한 명</b><span>프로그램 설치와 비밀 열쇠(API 키)는 꼭 어른과 같이 해요.</span></div>
+    <div><b>파이썬 (Python)</b><span>Unity·Suno·Jev에 필요해요. python.org 에서 받아요. 설치할 때 "Add to PATH"에 꼭 체크!</span></div>
+  </div>
+  <div class="note tip"><b>모든 연결의 마지막 단계는 똑같아요</b>Claude 앱을 <u>완전히 끄고</u> 다시 켜기. 창만 닫으면 안 되고, 화면 오른쪽 아래 작업 표시줄의 Claude 아이콘을 오른쪽 클릭 → <span class="k">끝내기</span>를 눌러요.</div>
+</section>
+
+<!-- ========== HIGGSFIELD ========== -->
+<section id="higgsfield">
+  <div class="band" style="background:var(--higgs)">
+    <div class="meta"><h2>Higgsfield 연결하기</h2><p>그림과 동영상을 만들어 주는 친구. 공식 MCP가 있어서 제일 쉬워요.</p></div>
+    <span class="badge">★ 쉬움 · 주소 붙이기</span>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Claude 앱 설정 메뉴">
+        <rect x="6" y="6" width="248" height="158" rx="14" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="6" y="6" width="248" height="28" rx="14" fill="var(--line)"/>
+        <rect x="18" y="48" width="70" height="104" rx="8" fill="var(--tint)"/>
+        <rect x="26" y="60" width="54" height="10" rx="4" fill="var(--soft)" opacity=".5"/>
+        <rect x="22" y="80" width="62" height="20" rx="6" fill="var(--higgs)"/><text x="53" y="95" text-anchor="middle" font-size="12" fill="#fff">커넥터</text>
+        <rect x="26" y="112" width="54" height="10" rx="4" fill="var(--soft)" opacity=".5"/>
+        <rect x="102" y="56" width="140" height="12" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="102" y="78" width="110" height="12" rx="4" fill="var(--soft)" opacity=".3"/>
+        <circle cx="76" cy="94" r="20" fill="none" stroke="var(--sun)" stroke-width="4"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--higgs)">1</span><h3>설정 열기</h3></div>
+        <p>Claude 앱 왼쪽 아래 내 이름을 누르고 <span class="k">설정</span> → <span class="k">커넥터</span>로 가요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="사용자 지정 커넥터 추가 창에 주소를 붙여넣는 그림">
+        <rect x="20" y="16" width="220" height="140" rx="14" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <text x="130" y="44" text-anchor="middle" font-size="15" fill="var(--ink)">커스텀 커넥터 추가</text>
+        <text x="36" y="70" font-size="12" fill="var(--soft)">이름</text>
+        <rect x="36" y="76" width="188" height="20" rx="6" fill="var(--tint)"/><text x="44" y="91" font-size="12" fill="var(--ink)">Higgsfield</text>
+        <text x="36" y="112" font-size="12" fill="var(--soft)">서버 주소</text>
+        <rect x="36" y="118" width="188" height="20" rx="6" fill="var(--tint)" stroke="var(--higgs)" stroke-width="2"/>
+        <text x="44" y="133" font-size="11" fill="var(--ink)">https://mcp.higgsfield.ai/mcp</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--higgs)">2</span><h3>주소 붙여넣기</h3></div>
+        <p><span class="k">커스텀 커넥터 추가</span>를 누르고, 이름에 <b>Higgsfield</b>, 주소 칸에 아래 주소를 붙여넣어요.</p>
+        <pre class="code">https://mcp.higgsfield.ai/mcp<button class="copy" type="button">복사</button></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="로그인 창에서 허용 버튼을 누르는 그림">
+        <rect x="40" y="14" width="180" height="142" rx="14" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <circle cx="130" cy="52" r="18" fill="var(--higgs)"/>
+        <rect x="70" y="82" width="120" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="80" y="100" width="100" height="10" rx="4" fill="var(--soft)" opacity=".3"/>
+        <rect x="80" y="122" width="100" height="24" rx="10" fill="var(--higgs)"/><text x="130" y="139" text-anchor="middle" font-size="14" fill="#fff">허용</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--higgs)">3</span><h3>로그인하고 허용</h3></div>
+        <p><span class="k">연결</span>을 누르면 Higgsfield 로그인 창이 떠요. 내 계정으로 로그인하고 <span class="k">허용</span>을 눌러요. API 키는 필요 없어요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Claude 대화창에서 그림을 요청하는 모습">
+        <rect x="10" y="14" width="240" height="142" rx="14" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="90" y="30" width="148" height="36" rx="12" fill="var(--tint)"/>
+        <text x="164" y="53" text-anchor="middle" font-size="12" fill="var(--ink)">우주 고양이 그려줘!</text>
+        <rect x="22" y="78" width="120" height="66" rx="12" fill="var(--higgs)"/>
+        <circle cx="62" cy="108" r="14" fill="#fff"/><path d="M52 98 l4 -10 l6 8 M66 96 l6 -8 l2 10" stroke="#fff" stroke-width="3" fill="none"/>
+        <circle cx="112" cy="96" r="4" fill="var(--sun)"/><circle cx="100" cy="124" r="3" fill="var(--sun)"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--higgs)">4</span><h3>부탁해 보기</h3></div>
+        <p>새 대화를 열고 "Higgsfield로 우주에 사는 고양이 그림 만들어줘"라고 말해 봐요. 처음엔 Claude가 "써도 돼요?" 하고 물어보니 <span class="k">허용</span>을 눌러요.</p>
+        <div class="note warn"><b>크레딧이 써져요</b>MCP로 만들 때는 Higgsfield 웹사이트의 무료 생성이 적용되지 않고 내 크레딧이 줄어요.</div>
+      </div>
+    </div>
+  </div>
+  <div class="note tip"><b>Claude Code를 쓴다면</b>터미널에 이 한 줄만 입력하고, 처음 쓸 때 브라우저에서 로그인하면 돼요.
+    <pre class="code">claude mcp add --transport http higgsfield https://mcp.higgsfield.ai/mcp<button class="copy" type="button">복사</button></pre></div>
+</section>
+
+<!-- ========== UNITY ========== -->
+<section id="unity">
+  <div class="band" style="background:var(--unity)">
+    <div class="meta"><h2>Unity 연결하기</h2><p>게임을 만드는 친구. Unity 안에 작은 다리(플러그인)를 놓으면 Claude가 게임 장면을 직접 고쳐 줘요.</p></div>
+    <span class="badge">★★ 보통 · 자동 설정 버튼</span>
+  </div>
+  <div class="note tip"><b>여기서 쓰는 도구</b>무료 공개 프로젝트 <b>MCP for Unity</b>(CoplayDev)를 써요. 미리 <b>Python 3.12 이상</b>과 <b>uv</b>를 설치해 두세요. uv는 PowerShell에 아래 줄을 붙여넣으면 깔려요.
+    <pre class="code">powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"<button class="copy" type="button">복사</button></pre></div>
+  <div class="steps">
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Unity의 Window 메뉴에서 Package Manager를 고르는 그림">
+        <rect x="6" y="6" width="248" height="158" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="6" y="6" width="248" height="26" rx="12" fill="var(--unity)"/>
+        <text x="22" y="24" font-size="12" fill="#fff">File   Edit   Assets   Window</text>
+        <rect x="150" y="32" width="100" height="92" rx="6" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+        <rect x="154" y="64" width="92" height="22" rx="5" fill="var(--unity)"/>
+        <text x="200" y="79" text-anchor="middle" font-size="11" fill="#fff">Package Manager</text>
+        <rect x="160" y="44" width="70" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+        <rect x="160" y="96" width="70" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--unity)">1</span><h3>패키지 관리자 열기</h3></div>
+        <p>Unity에서 내 프로젝트를 열고, 위 메뉴 <span class="k">Window</span> → <span class="k">Package Manager</span>를 눌러요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="플러스 버튼에서 git URL로 패키지 추가">
+        <rect x="6" y="6" width="248" height="158" rx="12" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <circle cx="30" cy="30" r="14" fill="var(--unity)"/><text x="30" y="36" text-anchor="middle" font-size="18" fill="#fff">+</text>
+        <rect x="20" y="52" width="160" height="72" rx="6" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/>
+        <rect x="24" y="96" width="152" height="22" rx="5" fill="var(--unity)"/>
+        <text x="100" y="111" text-anchor="middle" font-size="11" fill="#fff">Add package from git URL</text>
+        <rect x="30" y="62" width="110" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+        <rect x="30" y="78" width="110" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+        <rect x="20" y="132" width="220" height="22" rx="6" fill="var(--tint)" stroke="var(--unity)" stroke-width="2"/>
+        <text x="28" y="147" font-size="10" fill="var(--ink)">https://github.com/CoplayDev/unity-mcp...</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--unity)">2</span><h3>주소로 패키지 넣기</h3></div>
+        <p>왼쪽 위 <span class="k">+</span> 버튼 → <span class="k">Add package from git URL</span>을 누르고, 아래 주소를 붙여넣은 다음 <span class="k">Add</span>.</p>
+        <pre class="code">https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity<button class="copy" type="button">복사</button></pre>
+        <p style="font-size:15px;color:var(--soft)">안 되면 프로젝트 GitHub 페이지 README에 적힌 최신 주소를 써요. 버전에 따라 주소 끝부분이 바뀔 수 있어요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="MCP for Unity 창에서 Auto-Setup 버튼을 누르는 그림">
+        <rect x="30" y="10" width="200" height="150" rx="12" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="30" y="10" width="200" height="28" rx="12" fill="var(--unity)"/>
+        <text x="130" y="29" text-anchor="middle" font-size="13" fill="#fff">MCP for Unity</text>
+        <circle cx="54" cy="62" r="7" fill="#22C55E"/><rect x="68" y="56" width="100" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="50" y="84" width="160" height="10" rx="4" fill="var(--soft)" opacity=".3"/>
+        <rect x="70" y="112" width="120" height="30" rx="10" fill="var(--sun)"/>
+        <text x="130" y="132" text-anchor="middle" font-size="14" fill="#24324A">Auto-Setup</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--unity)">3</span><h3>자동 설정 누르기</h3></div>
+        <p>메뉴 <span class="k">Window</span> → <span class="k">MCP for Unity</span>를 열고, <span class="k">Auto-Setup</span>(또는 Claude 옆 <span class="k">Configure</span>) 버튼을 눌러요. Claude 설정 파일을 알아서 써 줘요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Claude에게 빨간 공을 만들어 달라고 하자 Unity 화면에 공이 생기는 그림">
+        <rect x="6" y="20" width="110" height="130" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="16" y="34" width="90" height="40" rx="10" fill="var(--tint)"/>
+        <text x="61" y="52" text-anchor="middle" font-size="11" fill="var(--ink)">빨간 공을</text><text x="61" y="66" text-anchor="middle" font-size="11" fill="var(--ink)">만들어줘</text>
+        <path d="M122 85 H140" stroke="var(--ink)" stroke-width="4" marker-end="url(#ar)"/>
+        <rect x="144" y="20" width="110" height="130" rx="12" fill="var(--unity)"/>
+        <path d="M150 126 L248 126" stroke="#ffffff55" stroke-width="2"/>
+        <circle cx="199" cy="100" r="24" fill="#EF4444"/><circle cx="191" cy="92" r="6" fill="#fff" opacity=".6"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--unity)">4</span><h3>Claude 다시 켜고 부탁하기</h3></div>
+        <p>Claude 앱을 완전히 끄고 다시 켜요. Unity는 켜 둔 채로 "Unity 장면에 빨간 공 하나 만들어줘"라고 말해 봐요.</p>
+        <div class="note ok"><b>잘 됐는지 보는 법</b>Unity 창 안에 초록불(연결됨)이 켜져 있고, Claude 대화창의 도구 목록에 unity 도구가 보이면 성공!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ASIDE ========== -->
+<section id="aside">
+  <div class="band" style="background:var(--aside)">
+    <div class="meta"><h2>Aside 연결하기</h2><p>대신 웹서핑을 해 주는 AI 브라우저. 연결하면 Claude가 Aside에 열린 웹페이지를 보고 정보를 가져와요.</p></div>
+    <span class="badge">★★ 보통 · 설정 파일</span>
+  </div>
+  <div class="note tip"><b>Aside는 공식 MCP가 있어요</b>Aside 안에 들어 있는 작은 프로그램 <b>aside</b>(CLI)가 MCP 서버 역할을 해요. 그래서 이 프로그램만 깔면 돼요.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Aside 브라우저를 설치하고 로그인하는 그림">
+        <rect x="10" y="16" width="240" height="138" rx="14" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="10" y="16" width="240" height="30" rx="14" fill="var(--aside)"/>
+        <circle cx="30" cy="31" r="5" fill="#fff"/><circle cx="46" cy="31" r="5" fill="#fff" opacity=".7"/>
+        <rect x="64" y="23" width="170" height="16" rx="8" fill="#ffffff55"/><text x="76" y="35" font-size="11" fill="#fff">aside.com</text>
+        <circle cx="130" cy="84" r="18" fill="var(--aside)"/>
+        <rect x="80" y="112" width="100" height="26" rx="10" fill="var(--aside)"/><text x="130" y="130" text-anchor="middle" font-size="13" fill="#fff">로그인</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--aside)">1</span><h3>Aside 설치하고 로그인</h3></div>
+        <p>어른과 함께 <b>aside.com</b>에서 Aside를 내려받아 설치하고, 내 계정으로 로그인해요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Aside 개발자 설정에서 CLI 설치 버튼을 누르는 그림">
+        <rect x="6" y="6" width="248" height="158" rx="14" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="18" y="20" width="70" height="132" rx="8" fill="var(--tint)"/>
+        <rect x="22" y="100" width="62" height="20" rx="6" fill="var(--aside)"/><text x="53" y="115" text-anchor="middle" font-size="12" fill="#fff">개발자</text>
+        <rect x="26" y="36" width="54" height="10" rx="4" fill="var(--soft)" opacity=".4"/><rect x="26" y="62" width="54" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="104" y="96" width="136" height="30" rx="10" fill="var(--sun)"/><text x="172" y="116" text-anchor="middle" font-size="14" fill="#24324A">CLI 설치</text>
+        <rect x="104" y="40" width="120" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="104" y="60" width="90" height="10" rx="4" fill="var(--soft)" opacity=".3"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--aside)">2</span><h3>작은 프로그램(CLI) 깔기</h3></div>
+        <p>Aside의 <span class="k">설정</span> → <span class="k">개발자</span>에서 <span class="k">CLI 설치</span>를 눌러요. 이 화면에 <b>aside 프로그램이 있는 위치(경로)</b>가 나오면 적어 두세요.</p>
+        <p style="font-size:15px;color:var(--soft)">맥에서는 터미널에 이 줄을 붙여넣어도 돼요.</p>
+        <pre class="code">curl -fsSL https://releases.aside.com/install.sh | bash<button class="copy" type="button">복사</button></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="명령 창에 aside mcp를 입력해 확인하는 그림">
+        <rect x="10" y="16" width="240" height="138" rx="12" fill="var(--code)"/>
+        <circle cx="28" cy="32" r="5" fill="#EF4444"/><circle cx="44" cy="32" r="5" fill="#F59E0B"/><circle cx="60" cy="32" r="5" fill="#22C55E"/>
+        <text x="24" y="70" font-size="14" fill="#A7F3D0" font-family="Consolas,monospace">&gt; aside mcp</text>
+        <text x="24" y="98" font-size="13" fill="#E5E7EB" font-family="Consolas,monospace">  서버 준비 완료</text>
+        <text x="24" y="126" font-size="12" fill="#9CA3AF" font-family="Consolas,monospace">  (Ctrl+C 로 끄기)</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--aside)">3</span><h3>잘 깔렸는지 확인</h3></div>
+        <p>PowerShell(맥은 터미널)을 열고 아래를 입력해요. 오류 없이 멈춰 있으면 성공이에요. <kbd>Ctrl</kbd>+<kbd>C</kbd>로 꺼요.</p>
+        <pre class="code">aside mcp<button class="copy" type="button">복사</button></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="설정 파일에 aside 칸을 적는 그림">
+        <rect x="20" y="10" width="220" height="150" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="20" y="10" width="220" height="24" rx="10" fill="var(--line)"/>
+        <text x="34" y="62" font-size="13" fill="var(--aside)" font-family="Consolas,monospace">"aside": {</text>
+        <text x="48" y="84" font-size="13" fill="var(--ink)" font-family="Consolas,monospace">"command": "aside",</text>
+        <text x="48" y="106" font-size="13" fill="var(--ink)" font-family="Consolas,monospace">"args": ["mcp"]</text>
+        <text x="34" y="128" font-size="13" fill="var(--aside)" font-family="Consolas,monospace">}</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--aside)">4</span><h3>Claude 설정 파일에 적기</h3></div>
+        <p>Claude <span class="k">설정</span> → <span class="k">개발자</span> → <span class="k">설정 편집</span>으로 <b>claude_desktop_config.json</b>을 열고 "aside" 칸을 넣어요. 다른 서버가 있으면 쉼표로 이어 붙여요.</p>
+        <pre class="code">{
+  "mcpServers": {
+    "aside": {
+      "command": "aside",
+      "args": ["mcp"]
+    }
+  }
+}<button class="copy" type="button">복사</button></pre>
+        <p style="font-size:15px;color:var(--soft)">2번에서 경로를 적어 뒀다면 "aside" 대신 그 경로를 넣어요. 연결이 안 될 때 특히 도움이 돼요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Claude가 Aside 브라우저 화면을 읽어 오는 그림">
+        <rect x="6" y="20" width="110" height="130" rx="12" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="16" y="34" width="90" height="40" rx="10" fill="var(--tint)"/>
+        <text x="61" y="52" text-anchor="middle" font-size="11" fill="var(--ink)">열린 페이지</text><text x="61" y="66" text-anchor="middle" font-size="11" fill="var(--ink)">요약해줘</text>
+        <path d="M140 85 H122" stroke="var(--ink)" stroke-width="4" marker-end="url(#ar)"/>
+        <rect x="144" y="20" width="110" height="130" rx="12" fill="var(--card)" stroke="var(--aside)" stroke-width="3"/>
+        <rect x="144" y="20" width="110" height="24" rx="12" fill="var(--aside)"/>
+        <rect x="156" y="58" width="86" height="8" rx="3" fill="var(--soft)" opacity=".5"/>
+        <rect x="156" y="76" width="70" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+        <rect x="156" y="94" width="80" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+        <rect x="156" y="112" width="60" height="8" rx="3" fill="var(--soft)" opacity=".4"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--aside)">5</span><h3>다시 켜고 부탁하기</h3></div>
+        <p>Claude를 완전히 끄고 다시 켜요. Aside는 켜 둔 채로 "Aside로 지금 열린 페이지 내용 요약해줘"라고 말해 봐요.</p>
+        <div class="note warn"><b>조심해요</b>Aside는 내가 로그인한 사이트도 볼 수 있어요. Claude가 무언가를 누르거나 보내려고 하면 꼭 내용을 읽어 보고 허용해요.</div>
+      </div>
+    </div>
+  </div>
+  <div class="note tip"><b>Claude Code를 쓴다면</b>터미널에 이 한 줄을 입력해요.
+    <pre class="code">claude mcp add aside -- aside mcp<button class="copy" type="button">복사</button></pre></div>
+</section>
+
+<!-- ========== SUNO ========== -->
+<section id="suno">
+  <div class="band" style="background:var(--suno)">
+    <div class="meta"><h2>Suno 연결하기</h2><p>노래를 만들어 주는 친구. 하지만 Suno는 아직 공식 MCP가 없어요.</p></div>
+    <span class="badge">★★★ 어려움 · 설정 파일</span>
+  </div>
+  <div class="note warn"><b>먼저 꼭 읽어요</b>지금 쓸 수 있는 Suno MCP는 회사가 만든 게 아니라 다른 사람들이 만든 <b>비공식 도구</b>예요. 갑자기 고장 날 수 있고, Suno 이용 약관에 어긋날 수도 있어요. 어른과 함께 약관을 읽어 보고 결정해요. 또 비공식 사이트에 내 비밀번호를 적으면 안 돼요.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="두 갈래 길: 브라우저 방식과 API 키 방식">
+        <path d="M130 160 V110 M130 110 L60 50 M130 110 L200 50" stroke="var(--line)" stroke-width="14" stroke-linecap="round" fill="none"/>
+        <rect x="10" y="14" width="100" height="44" rx="12" fill="var(--suno)"/>
+        <text x="60" y="34" text-anchor="middle" font-size="13" fill="#fff">A. 브라우저</text><text x="60" y="50" text-anchor="middle" font-size="11" fill="#fff">내 Suno 로그인</text>
+        <rect x="150" y="14" width="100" height="44" rx="12" fill="var(--card)" stroke="var(--suno)" stroke-width="3"/>
+        <text x="200" y="34" text-anchor="middle" font-size="13" fill="var(--suno)">B. API 키</text><text x="200" y="50" text-anchor="middle" font-size="11" fill="var(--suno)">외부 서비스</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--suno)">1</span><h3>방법 고르기</h3></div>
+        <p><b>A. 브라우저 방식</b> (<span class="k">suno-mcp</span>): 컴퓨터 안의 브라우저가 내 Suno 계정으로 대신 버튼을 눌러 줘요. 내 크레딧을 써요.</p>
+        <p><b>B. API 키 방식</b> (<span class="k">MCP-Suno</span>): 돈을 내는 외부 API 서비스의 키가 필요해요.</p>
+        <p>여기서는 <b>A</b>로 설명할게요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="검은 명령 창에 명령어를 입력하는 그림">
+        <rect x="10" y="16" width="240" height="138" rx="12" fill="var(--code)"/>
+        <circle cx="28" cy="32" r="5" fill="#EF4444"/><circle cx="44" cy="32" r="5" fill="#F59E0B"/><circle cx="60" cy="32" r="5" fill="#22C55E"/>
+        <text x="24" y="64" font-size="13" fill="#A7F3D0" font-family="Consolas,monospace">&gt; pip install ...</text>
+        <text x="24" y="88" font-size="13" fill="#A7F3D0" font-family="Consolas,monospace">&gt; playwright install</text>
+        <text x="24" y="112" font-size="13" fill="#E5E7EB" font-family="Consolas,monospace">  설치 완료!</text>
+        <rect x="24" y="124" width="10" height="16" fill="#E5E7EB"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--suno)">2</span><h3>명령 창에서 설치하기</h3></div>
+        <p>시작 메뉴에서 <span class="k">PowerShell</span>을 열고 아래를 한 줄씩 붙여넣어요. (Python 3.10 이상과 Git이 필요해요.)</p>
+        <pre class="code">git clone https://github.com/David-J-Shibley/suno-mcp.git
+cd suno-mcp
+pip install -e .
+playwright install chromium<button class="copy" type="button">복사</button></pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="Claude 설정의 개발자 탭에서 설정 편집 버튼">
+        <rect x="6" y="6" width="248" height="158" rx="14" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="18" y="20" width="70" height="132" rx="8" fill="var(--tint)"/>
+        <rect x="22" y="100" width="62" height="20" rx="6" fill="var(--suno)"/><text x="53" y="115" text-anchor="middle" font-size="12" fill="#fff">개발자</text>
+        <rect x="26" y="36" width="54" height="10" rx="4" fill="var(--soft)" opacity=".4"/><rect x="26" y="62" width="54" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+        <rect x="110" y="96" width="120" height="30" rx="10" fill="var(--sun)"/><text x="170" y="116" text-anchor="middle" font-size="14" fill="#24324A">설정 편집</text>
+        <rect x="110" y="40" width="120" height="10" rx="4" fill="var(--soft)" opacity=".4"/>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--suno)">3</span><h3>Claude 설정 파일 열기</h3></div>
+        <p>Claude 앱 <span class="k">설정</span> → <span class="k">개발자</span> → <span class="k">설정 편집</span>을 누르면 <b>claude_desktop_config.json</b> 파일이 있는 폴더가 열려요. 메모장으로 열어요.</p>
+        <p style="font-size:15px;color:var(--soft)">파일 위치: <span class="k">%APPDATA%\Claude\claude_desktop_config.json</span></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="메모장에 중괄호로 된 설정을 적는 그림">
+        <rect x="20" y="10" width="220" height="150" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="20" y="10" width="220" height="24" rx="10" fill="var(--line)"/>
+        <text x="34" y="58" font-size="13" fill="var(--suno)" font-family="Consolas,monospace">{ "mcpServers": {</text>
+        <text x="48" y="80" font-size="13" fill="var(--ink)" font-family="Consolas,monospace">"suno": { ... }</text>
+        <text x="34" y="102" font-size="13" fill="var(--suno)" font-family="Consolas,monospace">} }</text>
+        <rect x="140" y="124" width="84" height="24" rx="8" fill="var(--sun)"/><text x="182" y="141" text-anchor="middle" font-size="13" fill="#24324A">저장 Ctrl+S</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--suno)">4</span><h3>Suno 칸 적고 저장</h3></div>
+        <p>아래처럼 적고 저장해요. <b>실행 명령(command·args)은 예시예요.</b> suno-mcp README에 적힌 실행 방법으로 바꿔 넣어야 해요.</p>
+        <pre class="code">{
+  "mcpServers": {
+    "suno": {
+      "command": "python",
+      "args": ["-m", "suno_mcp"]
+    }
+  }
+}<button class="copy" type="button">복사</button></pre>
+        <div class="note tip"><b>이미 다른 서버가 있다면</b>"mcpServers" 괄호 안에 쉼표(,)를 찍고 "suno" 칸만 이어 붙여요. 괄호 짝이 하나라도 틀리면 전부 안 돼요.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="음표가 나오는 Claude">
+        <rect x="80" y="40" width="100" height="96" rx="26" fill="var(--claude)"/>
+        <circle cx="112" cy="80" r="9" fill="#fff"/><circle cx="148" cy="80" r="9" fill="#fff"/>
+        <ellipse cx="130" cy="110" rx="12" ry="9" fill="#fff"/>
+        <g fill="var(--suno)"><circle cx="40" cy="60" r="9"/><rect x="46" y="22" width="4" height="40"/>
+        <circle cx="220" cy="50" r="9"/><rect x="226" y="12" width="4" height="40"/>
+        <circle cx="210" cy="130" r="7"/><rect x="215" y="100" width="3" height="32"/></g>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--suno)">5</span><h3>다시 켜고 첫 로그인</h3></div>
+        <p>Claude를 완전히 끄고 다시 켜요. "Suno 크레딧 얼마나 남았어?"라고 물어보면 브라우저 창이 떠요. 그 창에서 <b>내가 직접</b> Suno에 로그인해요. 한 번 하면 기억해 둬요.</p>
+        <p>그다음 "신나는 여름 방학 노래 만들어줘!" 해 보세요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== JEV ========== -->
+<section id="jev">
+  <div class="band" style="background:var(--jev)">
+    <div class="meta"><h2>Jev 연결하기</h2><p>질문에 "몇 점?", "어느 쪽?"처럼 딱 정해진 답을 주는 AI 모델 (TypeSafe Jev).</p></div>
+    <span class="badge">★★★ 어려움 · API 키</span>
+  </div>
+  <div class="note warn"><b>Jev가 맞는지 확인해요</b>"jev"라는 이름으로 찾은 MCP는 TypeSafe의 <b>Jev 모델</b>용 서버(jev-mcp)예요. 공식 문서가 적어서 MCP Market 소개 글을 기준으로 썼어요. 다른 프로그램을 말한 거라면 알려 주세요.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="금고 속 열쇠: API 키는 비밀">
+        <rect x="70" y="30" width="120" height="110" rx="16" fill="var(--card)" stroke="var(--jev)" stroke-width="4"/>
+        <circle cx="130" cy="85" r="24" fill="none" stroke="var(--jev)" stroke-width="5"/>
+        <path d="M130 85 L146 69" stroke="var(--jev)" stroke-width="5" stroke-linecap="round"/>
+        <g transform="translate(184 100) rotate(-30)"><circle r="12" fill="var(--sun)"/><rect x="10" y="-4" width="40" height="8" rx="3" fill="var(--sun)"/><rect x="38" y="4" width="6" height="10" fill="var(--sun)"/></g>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--jev)">1</span><h3>비밀 열쇠(API 키) 받기</h3></div>
+        <p>어른과 함께 <b>TypeSafe</b> 또는 <b>OpenRouter</b>에 가입하고 API 키를 만들어요. API 키는 비밀번호와 같아요. 친구에게 보여 주거나 인터넷에 올리면 안 돼요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="상자를 내 컴퓨터로 내려받는 그림">
+        <rect x="70" y="70" width="120" height="80" rx="10" fill="var(--jev)"/>
+        <path d="M70 70 L100 40 H160 L190 70" fill="var(--jev)" opacity=".7"/>
+        <path d="M130 10 V56" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/><path d="M114 42 L130 58 L146 42" stroke="var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <text x="130" y="118" text-anchor="middle" font-size="16" fill="#fff">jev-mcp</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--jev)">2</span><h3>서버 내려받기</h3></div>
+        <p>MCP Market의 <b>jev</b> 페이지에서 GitHub 주소를 찾아 내려받아요. 파이썬 파일 하나로 되어 있어서 따로 설치할 게 거의 없어요. 받은 폴더 위치(예: <span class="k">C:\mcp\jev-mcp</span>)를 기억해요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="설정 파일에 jev 칸과 열쇠 칸을 적는 그림">
+        <rect x="20" y="10" width="220" height="150" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="3"/>
+        <text x="34" y="46" font-size="12" fill="var(--jev)" font-family="Consolas,monospace">"jev": {</text>
+        <text x="46" y="68" font-size="12" fill="var(--ink)" font-family="Consolas,monospace">"command": ...</text>
+        <text x="46" y="90" font-size="12" fill="var(--ink)" font-family="Consolas,monospace">"env": {</text>
+        <rect x="56" y="98" width="150" height="20" rx="5" fill="var(--tint)" stroke="var(--sun)" stroke-width="2"/>
+        <text x="62" y="112" font-size="11" fill="var(--ink)" font-family="Consolas,monospace">"API_KEY": "****"</text>
+        <text x="46" y="136" font-size="12" fill="var(--ink)" font-family="Consolas,monospace">} }</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--jev)">3</span><h3>설정 파일에 적기</h3></div>
+        <p>Suno 3번처럼 <b>claude_desktop_config.json</b>을 열고 "jev" 칸을 추가해요. 파일 이름과 키 이름은 jev-mcp README에 적힌 대로 바꿔요.</p>
+        <pre class="code">"jev": {
+  "command": "python",
+  "args": ["C:\\mcp\\jev-mcp\\server.py"],
+  "env": { "TYPESAFE_API_KEY": "여기에-내-키" }
+}<button class="copy" type="button">복사</button></pre>
+        <p style="font-size:15px;color:var(--soft)">윈도우 경로는 역슬래시를 두 번(\\) 써야 해요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="pic"><svg viewBox="0 0 260 170" role="img" aria-label="점수 막대가 나오는 결과">
+        <rect x="10" y="14" width="240" height="142" rx="14" fill="var(--paper)" stroke="var(--line)" stroke-width="3"/>
+        <text x="28" y="46" font-size="13" fill="var(--ink)">이 문장 기분 점수는?</text>
+        <rect x="28" y="66" width="200" height="18" rx="9" fill="var(--tint)"/>
+        <rect x="28" y="66" width="160" height="18" rx="9" fill="var(--jev)"/>
+        <text x="28" y="112" font-size="13" fill="var(--ink)">8 / 10 · 자신감 92%</text>
+      </svg></div>
+      <div class="txt">
+        <div class="step-head"><span class="num" style="background:var(--jev)">4</span><h3>다시 켜고 물어보기</h3></div>
+        <p>Claude를 완전히 끄고 다시 켜요. "Jev로 이 문장이 얼마나 기쁜지 점수 매겨줘"처럼 물어봐요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 고장 났을 때 ========== -->
+<section id="help">
+  <h2>안 될 때 확인할 것</h2>
+  <div class="prep">
+    <div><b>Claude를 정말 껐나요?</b><span>작업 표시줄에서 끝내기까지 해야 새 설정을 읽어요.</span></div>
+    <div><b>괄호와 쉼표</b><span>설정 파일에서 { } 짝이 맞는지, 마지막 칸 뒤에 쉼표가 남아 있지 않은지 봐요.</span></div>
+    <div><b>"서버 연결 끊김" 알림</b><span>설정 → 개발자에서 빨간 서버를 눌러 로그를 봐요. 보통 python 경로나 설치가 문제예요.</span></div>
+    <div><b>크레딧</b><span>Suno·Higgsfield는 크레딧이 없으면 만들지 못해요.</span></div>
+  </div>
+</section>
+
+<footer>
+  <p>2026년 10월 기준으로 정리했어요. 앱 화면과 메뉴 이름은 업데이트되면 조금씩 달라질 수 있어요.</p>
+  <p>참고: <a href="https://www.miracamp.com/learn/content-creation/claude-x-higgsfield-mcp-connector">Higgsfield MCP 커넥터</a> ·
+    <a href="https://glama.ai/mcp/servers/@CoplayDev/unity-mcp/blob/08b8eacab13da57ed13859167fa6033c6441f58d/MCPForUnity/README.md">MCP for Unity</a> ·
+    <a href="https://docs.aside.com/help/developers">Aside CLI·MCP</a> ·
+    <a href="https://lobehub.com/mcp/david-j-shibley-suno-mcp">suno-mcp</a> ·
+    <a href="https://glama.ai/mcp/servers/lioensky/MCP-Suno">MCP-Suno</a> ·
+    <a href="https://mcpmarket.com/server/jev-2">jev-mcp</a></p>
+</footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var pre=btn.parentElement, text=pre.innerText.replace(/\s*복사됨?$/,'').replace(/복사$/,'').trimEnd();
+    var done=function(){btn.textContent='복사됨';setTimeout(function(){btn.textContent='복사'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r)};
+    try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+
+</body></html>
